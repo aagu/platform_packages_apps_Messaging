@@ -44,4 +44,7 @@
     <string name="captchas_with_provider_title">验证码是 %1$s 【%2$s】</string>
     <string name="captchas_content">收到一条短信验证码, 点按以复制.</string>
     <string name="captchas_has_copied">验证码已复制到剪切板, 长按输入框粘贴.</string>
+    <string name="captchas_auto_archive_title">归档验证码短信</string>
+    <string name="captchas_auto_archive_summary">自动归档验证码短信</string>
+    <string name="archive_category_pref_title">归档</string>
 </resources>
