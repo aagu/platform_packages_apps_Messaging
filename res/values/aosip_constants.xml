@@ -26,7 +26,7 @@
     <!-- Application-wide settings -->
     <bool name="show_emoticons_pref_default" translatable="false">true</bool>
 
-    <string name="captchas_auto_archive_pref_key" translatable="false">captchas_auto_archive</string>
+    <string name="captchas_auto_archive_pref_key" translatable="false">buglesub_captchas_auto_archive</string>
     <bool name="captchas_auto_archive_pref_default" translatable="false">true</bool>
 
 </resources>

@@ -1177,7 +1177,9 @@ public class MmsUtils {
         final Context context = Factory.get().getApplicationContext();
         final Resources resources = context.getResources();
         final BuglePrefs prefs = BuglePrefs.getSubscriptionPrefs(subId);
-        return prefs.getBoolean(resources.getString(R.string.captchas_auto_archive_pref_key),resources.getBoolean(R.bool.captchas_auto_archive_pref_default));
+        final String mmsAutoArchiveCaptchasKey = resources.getString(R.string.captchas_auto_archive_pref_key);
+        final boolean defaultValue = resources.getBoolean(R.bool.captchas_auto_archive_pref_default);
+        return prefs.getBoolean(mmsAutoArchiveCaptchasKey, defaultValue);
     }
 
     /**
