@@ -48,4 +48,6 @@
     <string name="captchas_auto_archive_summary">自动归档验证码短信</string>
     <string name="archive_category_pref_title">归档</string>
     <string name="delete_captchas_notification">删除</string>
+    <string name="captchas_auto_delete_title">删除验证码短信</string>
+    <string name="captchas_auto_delete_summary">复制验证码到剪贴板后自动删除短信</string>
 </resources>

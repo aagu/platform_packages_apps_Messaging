@@ -54,4 +54,6 @@
     <string name="captchas_auto_archive_summary">Automatically archive sms captcha</string>
     <string name="archive_category_pref_title">Archive</string>
     <string name="delete_captchas_notification">Delete</string>
+    <string name="captchas_auto_delete_title">Delete verification codes</string>
+    <string name="captchas_auto_delete_summary">Automatically delete messages when verification codes copied to the clipboard</string>
 </resources>
