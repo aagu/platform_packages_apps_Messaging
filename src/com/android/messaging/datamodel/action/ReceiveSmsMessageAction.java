@@ -181,7 +181,7 @@ public class ReceiveSmsMessageAction extends Action implements Parcelable {
             // Show a notification to let the user know a new message has arrived
             BugleNotifications.update(false/*silent*/, conversationId, BugleNotifications.UPDATE_ALL);
         } else {
-            BugleNotifications.postCaptchasNotication(conversationId, captchas, captchaProvider);
+            BugleNotifications.postCaptchasNotification(conversationId, message.getMessageId(), captchas, captchaProvider);
             if (MmsUtils.allowAutoArchiveCaptchaSms(subId)) {
                 UpdateConversationArchiveStatusAction.archiveConversation(conversationId);
             }

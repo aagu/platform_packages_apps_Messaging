@@ -339,6 +339,7 @@
 
         <!-- Sms and Mms related items -->
 
+        <receiver android:name=".receiver.DeleteMessageReceiver" />
         <receiver android:name=".receiver.CaptchasReceiver" />
         
         <!-- Intents for Notification and Pre-KLP Delivery -->
