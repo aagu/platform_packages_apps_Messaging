@@ -27,7 +27,6 @@ import android.provider.Telephony.Sms;
 import android.text.TextUtils;
 
 import com.android.messaging.Factory;
-import com.android.messaging.datamodel.action.UpdateConversationArchiveStatusAction;
 import com.android.messaging.datamodel.BugleDatabaseOperations;
 import com.android.messaging.datamodel.BugleNotifications;
 import com.android.messaging.datamodel.DataModel;
@@ -37,11 +36,8 @@ import com.android.messaging.datamodel.SyncManager;
 import com.android.messaging.datamodel.data.MessageData;
 import com.android.messaging.datamodel.data.ParticipantData;
 import com.android.messaging.sms.MmsSmsUtils;
-import com.android.messaging.sms.MmsUtils;
 import com.android.messaging.util.LogUtil;
 import com.android.messaging.util.OsUtil;
-
-import com.aagu.mms.utils.CaptchasUtils;
 
 /**
  * Action used to "receive" an incoming message
@@ -172,29 +168,12 @@ public class ReceiveSmsMessageAction extends Action implements Parcelable {
             }
         }
         // Show a notification to let the user know a new message has arrived
-        // BugleNotifications.update(false/*silent*/, conversationId, BugleNotifications.UPDATE_ALL);
-
-        // Get Captcha
-        final String captchas = getCaptchas(messageValues.getAsString(Sms.BODY));
-        final String captchaProvider = CaptchasUtils.getCaptchaProvider(messageValues.getAsString(Sms.BODY), messageValues.getAsString(Sms.ADDRESS));
-        if (TextUtils.isEmpty(captchas)) {
-            // Show a notification to let the user know a new message has arrived
-            BugleNotifications.update(false/*silent*/, conversationId, BugleNotifications.UPDATE_ALL);
-        } else {
-            BugleNotifications.postCaptchasNotification(conversationId, message.getMessageId(), captchas, captchaProvider);
-            if (MmsUtils.allowAutoArchiveCaptchaSms(subId)) {
-                UpdateConversationArchiveStatusAction.archiveConversation(conversationId);
-            }
-        }
+        BugleNotifications.update(false/*silent*/, conversationId, BugleNotifications.UPDATE_ALL);
 
         MessagingContentProvider.notifyMessagesChanged(conversationId);
         MessagingContentProvider.notifyPartsChanged();
 
         return message;
-    }
-
-    public static String getCaptchas(String messageBody) {
-        return CaptchasUtils.getCaptchasCode(messageBody);
     }
 
     private ReceiveSmsMessageAction(final Parcel in) {
