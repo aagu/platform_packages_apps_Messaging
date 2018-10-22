@@ -22,6 +22,8 @@ import android.database.Cursor;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewGroupCompat;
@@ -48,6 +50,7 @@ import com.android.messaging.datamodel.binding.BindingBase;
 import com.android.messaging.datamodel.data.ConversationListData;
 import com.android.messaging.datamodel.data.ConversationListData.ConversationListDataListener;
 import com.android.messaging.datamodel.data.ConversationListItemData;
+import com.android.messaging.ui.BugleActionBarActivity;
 import com.android.messaging.ui.BugleAnimationTags;
 import com.android.messaging.ui.ListEmptyView;
 import com.android.messaging.ui.SnackBarInteraction;
@@ -290,6 +293,62 @@ public class ConversationListFragment extends Fragment implements ConversationLi
         if (mListState != null && cursor != null && oldCursor == null) {
             mRecyclerView.getLayoutManager().onRestoreInstanceState(mListState);
         }
+        if (!mArchiveMode && !mForwardMessageMode) {
+            new Thread(() -> {
+                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+                queryBuilder.setTables(ConversationListItemData.getConversationListView());
+                queryBuilder.appendWhere(DatabaseHelper.ConversationColumns.ARCHIVE_STATUS + " = 1 AND " + DatabaseHelper.MessageColumns.READ + " = 0");
+                final Cursor countCursor = DataModel.get().getDatabase().query(queryBuilder, new String[] { DatabaseHelper.ConversationColumns._ID }, null, null, null, null, null, null);
+                if (countCursor != null) {
+                    Message msg = new Message();
+                    if (countCursor.getCount() > 0) {
+                        msg.what = countCursor.getCount();
+                    } else {
+                        msg.what = 0;
+                    }
+                    mHandler.sendMessage(msg);
+                }
+            }).start();
+        }
+    }
+
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what > 0) {
+                drawUnreadBadge(String.valueOf(msg.what));
+            } else {
+                mBadgeDrawable = null;
+            }
+            invalidateOptionsMenu();
+        }
+    };
+
+    private void invalidateOptionsMenu() {
+        final Activity activity = getActivity();
+        // TODO: Add the supportInvalidateOptionsMenu call to the host activity.
+        if (activity == null || !(activity instanceof BugleActionBarActivity)) {
+            return;
+        }
+        ((BugleActionBarActivity) activity).supportInvalidateOptionsMenu();
+    }
+
+    public void drawUnreadBadge(String count) {
+        Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setTextAlign(Paint.Align.CENTER);
+        mPaint.setColor(ContextCompat.getColor(getActivity(), R.color.action_bar_background_color_dark));
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_archive_small_light).copy(Bitmap.Config.ARGB_8888, true);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawBitmap(bitmap, 0, 0, mPaint);
+        float offset = bitmap.getWidth() * 0.2f;
+        float radius = bitmap.getWidth() / 5f;
+        canvas.drawCircle(bitmap.getWidth() - offset, bitmap.getHeight() - offset, radius, mPaint);
+        Paint textPaint = new Paint(mPaint);
+        textPaint.setTextSize(radius * 1.5f);
+        textPaint.setColor(Color.WHITE);
+        canvas.drawText(count, bitmap.getWidth() - offset, bitmap.getHeight() - offset / 2, textPaint);
+        mBadgeDrawable = new BitmapDrawable(getResources(), bitmap);
     }
 
     @Override
