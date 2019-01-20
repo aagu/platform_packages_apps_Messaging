@@ -32,4 +32,6 @@
     <string name="show_emoticons_pref_summary">在键盘上显示表情符号键</string>
     <!-- Shortcuts -->
     <string name="shortcuts_compose_new">新建信息</string>
+    <!-- Mark as read -->
+    <string name="notification_mark_as_read">标记为已读</string>
 </resources>
