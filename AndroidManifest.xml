@@ -339,6 +339,8 @@
 
         <!-- Sms and Mms related items -->
 
+        <receiver android:name=".receiver.CaptchasReceiver" />
+        
         <!-- Intents for Notification and Pre-KLP Delivery -->
         <!-- Registered with the highest possible priority (max_int) -->
         <receiver android:name=".receiver.MmsWapPushReceiver"

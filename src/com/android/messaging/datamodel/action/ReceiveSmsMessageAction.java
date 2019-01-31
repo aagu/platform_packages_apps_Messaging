@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2015 The Android Open Source Project
+ * Copyright (C) 2015-2016 The MoKee Open Source Project
+ * Copyright (C) 2019 aagu <aaguisme@gamil.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +38,8 @@ import com.android.messaging.datamodel.data.ParticipantData;
 import com.android.messaging.sms.MmsSmsUtils;
 import com.android.messaging.util.LogUtil;
 import com.android.messaging.util.OsUtil;
+
+import com.aagu.mms.utils.CaptchasUtils;
 
 /**
  * Action used to "receive" an incoming message
@@ -166,12 +170,26 @@ public class ReceiveSmsMessageAction extends Action implements Parcelable {
             }
         }
         // Show a notification to let the user know a new message has arrived
-        BugleNotifications.update(false/*silent*/, conversationId, BugleNotifications.UPDATE_ALL);
+        // BugleNotifications.update(false/*silent*/, conversationId, BugleNotifications.UPDATE_ALL);
+
+        // Get Captcha
+        final String captchas = getCaptchas(messageValues.getAsString(Sms.BODY));
+        final String captchaProvider = CaptchasUtils.getCaptchaProvider(messageValues.getAsString(Sms.BODY), messageValues.getAsString(Sms.ADDRESS));
+        if (TextUtils.isEmpty(captchas)) {
+            // Show a notification to let the user know a new message has arrived
+            BugleNotifications.update(false/*silent*/, conversationId, BugleNotifications.UPDATE_ALL);
+        } else {
+            BugleNotifications.postCaptchasNotication(conversationId, captchas, captchaProvider);
+        }
 
         MessagingContentProvider.notifyMessagesChanged(conversationId);
         MessagingContentProvider.notifyPartsChanged();
 
         return message;
+    }
+
+    public static String getCaptchas(String messageBody) {
+        return CaptchasUtils.getCaptchasCode(messageBody);
     }
 
     private ReceiveSmsMessageAction(final Parcel in) {

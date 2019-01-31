@@ -43,4 +43,10 @@
     <string name="notification_channel_title">Messages</string>
     <string name="background_worker_notif">Checking messages\u2026</string>
     <string name="foreground_service">Foreground Service</string>
+
+    <!-- Captchas -->
+    <string name="captchas_title">Captcha is %s</string>
+    <string name="captchas_with_provider_title">Captcha is %1$s 【%2$s】</string>
+    <string name="captchas_content">Received a captcha message, click to copy.</string>
+    <string name="captchas_has_copied">Captcha already copied to the clipboard, long press your input box to paste.</string>
 </resources>

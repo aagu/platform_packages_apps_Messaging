@@ -38,4 +38,9 @@
     <string name="notification_channel_title">信息</string>
     <string name="background_worker_notif">检查信息中\u2026</string>
     <string name="foreground_service">前台服务</string>
+    <!-- Captchas -->
+    <string name="captchas_title">验证码是 %s</string>
+    <string name="captchas_with_provider_title">验证码是 %1$s 【%2$s】</string>
+    <string name="captchas_content">收到一条短信验证码, 点按以复制.</string>
+    <string name="captchas_has_copied">验证码已复制到剪切板, 长按输入框粘贴.</string>
 </resources>
