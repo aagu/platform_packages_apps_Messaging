@@ -213,7 +213,7 @@ public class ActionServiceImpl extends IntentService {
         super.onCreate();
         mBackgroundWorker = DataModel.get().getBackgroundWorkerForActionService();
         DataModel.get().getConnectivityUtil().registerForSignalStrength();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String CHANNEL_ID = "my_channel_01";
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                     "Channel human readable title 1",
@@ -224,7 +224,7 @@ public class ActionServiceImpl extends IntentService {
                     .setContentText("").build();
             int NOTIFICATION_ID = (int) (System.currentTimeMillis()%10000);
             startForeground(NOTIFICATION_ID, notification);
-        }
+        }*/
     }
 
     @Override
