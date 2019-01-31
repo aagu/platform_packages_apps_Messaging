@@ -34,4 +34,7 @@
     <string name="shortcuts_compose_new">新建信息</string>
     <!-- Mark as read -->
     <string name="notification_mark_as_read">标记为已读</string>
+    <!-- Notification channel -->
+    <string name="notification_channel_title">信息</string>
+    <string name="background_worker_notif">检查信息中\u2026</string>
 </resources>
