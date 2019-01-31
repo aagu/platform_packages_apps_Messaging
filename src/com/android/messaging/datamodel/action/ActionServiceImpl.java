@@ -38,6 +38,8 @@ import com.android.messaging.util.LoggingTimer;
 import com.android.messaging.util.WakeLockHelper;
 import com.google.common.annotations.VisibleForTesting;
 
+import com.android.messaging.R;
+
 /**
  * ActionService used to perform background processing for data model
  */
@@ -213,10 +215,11 @@ public class ActionServiceImpl extends IntentService {
         super.onCreate();
         mBackgroundWorker = DataModel.get().getBackgroundWorkerForActionService();
         DataModel.get().getConnectivityUtil().registerForSignalStrength();
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String CHANNEL_ID = "my_channel_01";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String CHANNEL_ID = "foreground_service";
+            Context context = Factory.get().getApplicationContext();
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "Channel human readable title 1",
+                    context.getString(R.string.foreground_service),
                     NotificationManager.IMPORTANCE_DEFAULT);
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -224,7 +227,7 @@ public class ActionServiceImpl extends IntentService {
                     .setContentText("").build();
             int NOTIFICATION_ID = (int) (System.currentTimeMillis()%10000);
             startForeground(NOTIFICATION_ID, notification);
-        }*/
+        }
     }
 
     @Override
