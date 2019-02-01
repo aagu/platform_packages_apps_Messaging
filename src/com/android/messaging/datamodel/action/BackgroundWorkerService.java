@@ -49,7 +49,7 @@ import com.android.messaging.R;
 public class BackgroundWorkerService extends IntentService {
     private static final String TAG = LogUtil.BUGLE_DATAMODEL_TAG;
     private static final boolean VERBOSE = false;
-    private static final String CHANNEL_ID = "messaging_channel";
+    private static final String CHANNEL_ID = "foreground_service";
 
     private static final String WAKELOCK_ID = "bugle_background_worker_wakelock";
     @VisibleForTesting
@@ -205,9 +205,9 @@ public class BackgroundWorkerService extends IntentService {
         }
 
         Context context = Factory.get().getApplicationContext();
-        String title = context.getString(R.string.notification_channel_title);
+        String title = context.getString(R.string.notification_channel_service);
         NotificationChannel newChannel = new NotificationChannel(CHANNEL_ID,
-                title, NotificationManager.IMPORTANCE_DEFAULT);
+                title, NotificationManager.IMPORTANCE_NONE);
         manager.createNotificationChannel(newChannel);
     }
 }

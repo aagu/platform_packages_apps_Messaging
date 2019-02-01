@@ -35,9 +35,10 @@
     <!-- Mark as read -->
     <string name="notification_mark_as_read">标记为已读</string>
     <!-- Notification channel -->
-    <string name="notification_channel_title">信息</string>
+    <string name="notification_channel_message">信息</string>
+    <string name="notification_channel_service">前台服务</string>
     <string name="background_worker_notif">检查信息中\u2026</string>
-    <string name="foreground_service">前台服务</string>
+    <string name="action_service_notif">后台任务运行中\u2026</string>
     <!-- Captchas -->
     <string name="captchas_title">验证码是 %s</string>
     <string name="captchas_with_provider_title">验证码是 %1$s 【%2$s】</string>

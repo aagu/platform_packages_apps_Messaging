@@ -46,6 +46,7 @@ import com.android.messaging.R;
 public class ActionServiceImpl extends IntentService {
     private static final String TAG = LogUtil.BUGLE_DATAMODEL_TAG;
     private static final boolean VERBOSE = false;
+    private static final String CHANNEL_ID = "foreground_service";
 
     public ActionServiceImpl() {
         super("ActionService");
@@ -216,17 +217,13 @@ public class ActionServiceImpl extends IntentService {
         mBackgroundWorker = DataModel.get().getBackgroundWorkerForActionService();
         DataModel.get().getConnectivityUtil().registerForSignalStrength();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String CHANNEL_ID = "foreground_service";
+            createChannel();
             Context context = Factory.get().getApplicationContext();
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    context.getString(R.string.foreground_service),
-                    NotificationManager.IMPORTANCE_DEFAULT);
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("")
-                    .setContentText("").build();
-            int NOTIFICATION_ID = (int) (System.currentTimeMillis()%10000);
-            startForeground(NOTIFICATION_ID, notification);
+                .setContentTitle(context.getString(R.string.action_service_notif))
+                .build();
+            int notifId = (int) System.currentTimeMillis() % 10000;
+            startForeground(notifId, notification);
         }
     }
 
@@ -356,5 +353,20 @@ public class ActionServiceImpl extends IntentService {
             final Action action, final String methodName) {
         return new LoggingTimer(TAG, action.getClass().getSimpleName() + methodName,
                 EXECUTION_TIME_WARN_LIMIT_MS);
+    }
+
+    private void createChannel() {
+        NotificationManager manager = getSystemService(NotificationManager.class);
+
+        NotificationChannel existing = manager.getNotificationChannel(CHANNEL_ID);
+        if (existing != null) {
+            return;
+        }
+
+        Context context = Factory.get().getApplicationContext();
+        String title = context.getString(R.string.notification_channel_service);
+        NotificationChannel newChannel = new NotificationChannel(CHANNEL_ID,
+                title, NotificationManager.IMPORTANCE_NONE);
+        manager.createNotificationChannel(newChannel);
     }
 }
