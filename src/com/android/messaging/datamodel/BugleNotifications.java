@@ -201,22 +201,6 @@ public class BugleNotifications {
             MessageNotificationState.checkFailedMessages();
         }
     }
-
-    private static class CaptchasNotificationState extends MessageNotificationState {
-        CaptchasNotificationState() {
-            super(null);
-        }
-
-        @Override
-        protected Style build(Builder builder) {
-            return null;
-        }
-
-        @Override
-        public boolean getNotificationVibrate() {
-            return true;
-        }
-    }
     
     /**
      * Cancel all notifications of a certain type.
