@@ -217,57 +217,6 @@ public class BugleNotifications {
             return true;
         }
     }
-
-    public static synchronized void postCaptchasNotication(String conversationId, String messageId, String captchas, String captchaProvider) {
-        cancel(PendingIntentConstants.CAPTCHAS_NOTIFICATION_ID);
-        final NotificationState state = MessageNotificationState.getNotificationState();
-        final Context context = Factory.get().getApplicationContext();
-
-        String title = TextUtils.isEmpty(captchaProvider) ? String.format(context.getString(R.string.captchas_title), captchas)
-                : String.format(context.getString(R.string.captchas_with_provider_title), captchas, captchaProvider);
-        String content = context.getString(R.string.captchas_content);
-
-        Intent pendingIntent = new Intent();
-        pendingIntent.setClass(context, CaptchasReceiver.class);
-        pendingIntent.putExtra("captchas", captchas);
-        pendingIntent.putExtra("conversationId", conversationId);
-        PendingIntent captchasIntent = PendingIntent.getBroadcast(context, 0, pendingIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
-        builder.setContentTitle(title)
-                .setTicker(title)
-                .setSmallIcon(R.drawable.ic_sms_light)
-                .setContentText(content)
-                .setWhen(state != null ? state.getLatestReceivedTimestamp() : System.currentTimeMillis())
-        // Returning PRIORITY_HIGH causes L to put up a HUD notification. Without it, the ticker
-        // isn't displayed.
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setContentIntent(captchasIntent)
-                .setSound(state != null ? RingtoneUtil.getNotificationRingtoneUri(state.getRingtoneUri())
-                        : getNotificationRingtoneUriForConversationId(conversationId))
-                .setColor(context.getResources().getColor(R.color.notification_accent_color));
-
-        addDeleteMessageAction(builder, messageId);
-
-        final NotificationCompat.BigTextStyle bigTextStyle =
-                new NotificationCompat.BigTextStyle(builder);
-        bigTextStyle.setBigContentTitle(title);
-        bigTextStyle.bigText(content);
-        final Notification notification = bigTextStyle.build();
-
-        final NotificationManagerCompat notificationManager =
-                NotificationManagerCompat.from(Factory.get().getApplicationContext());
-
-        int defaults = Notification.DEFAULT_LIGHTS;
-        if (BugleNotifications.shouldVibrate(new CaptchasNotificationState())) {
-            defaults |= Notification.DEFAULT_VIBRATE;
-        }
-        notification.defaults = defaults;
-        notificationManager.notify(PendingIntentConstants.CAPTCHAS_NOTIFICATION_ID, notification);
-
-    }
-
     
     /**
      * Cancel all notifications of a certain type.
