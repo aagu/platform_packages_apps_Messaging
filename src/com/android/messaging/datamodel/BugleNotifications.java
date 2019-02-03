@@ -1057,7 +1057,9 @@ public class BugleNotifications {
         PendingIntent captchasIntent = PendingIntent.getBroadcast(context, 0, pendingIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        createChannel();
+        
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
         builder.setContentTitle(title)
                 .setTicker(title)
                 .setSmallIcon(R.drawable.ic_sms_light)
