@@ -31,7 +31,6 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.media.AudioManager;
-import android.mokee.location.PhoneNumberOfflineGeocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -68,7 +67,6 @@ import com.android.messaging.datamodel.media.MediaResourceManager;
 import com.android.messaging.datamodel.media.MessagePartVideoThumbnailRequestDescriptor;
 import com.android.messaging.datamodel.media.UriImageRequestDescriptor;
 import com.android.messaging.datamodel.media.VideoThumbnailRequest;
-import com.android.messaging.receiver.DeleteMessageReceiver;
 import com.android.messaging.receiver.CaptchaReceiver;
 import com.android.messaging.sms.MmsSmsUtils;
 import com.android.messaging.sms.MmsUtils;
@@ -90,8 +88,7 @@ import com.android.messaging.util.PhoneUtils;
 import com.android.messaging.util.RingtoneUtil;
 import com.android.messaging.util.ThreadUtil;
 import com.android.messaging.util.UriUtil;
-import com.mokee.mms.captcha.CaptchaInfo;
-import com.mokee.mms.captcha.CaptchaUtils;
+import com.aagu.mms.utils.*;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -851,8 +848,7 @@ public class BugleNotifications {
             final ConversationLineInfo convInfo =
                     ((MultiMessageNotificationState) notificationState).mConvList.mConvInfos.get(0);
             String content = ((MultiMessageNotificationState) notificationState).mContent.toString();
-            String number = convInfo.mSenderNormalizedDestination;
-            CaptchaInfo captchaInfo = CaptchaUtils.getCaptchaInfo(content, number);
+            CaptchaUtils.CaptchaInfo captchaInfo = CaptchaUtils.getCaptchaInfo(content);
             if (captchaInfo != null) {
                 isCaptchaMessage = true;
                 String captchaTitle = TextUtils.isEmpty(captchaInfo.getProvider())
@@ -878,18 +874,12 @@ public class BugleNotifications {
                 if (MmsUtils.allowAutoArchiveCaptchaSms(convInfo.mSubId)) {
                     UpdateConversationArchiveStatusAction.archiveConversation(notificationState.mConversationIds.first());
                 }
-            } else {
-                if (MmsUtils.allowAutoArchivePublicServiceSms(convInfo.mSubId)
-                        && PhoneNumberOfflineGeocoder.getPhoneLocation(number).equals("信息服务台")) {
-                    UpdateConversationArchiveStatusAction.archiveConversation(notificationState.mConversationIds.first());
-                }
             }
 
             if (!isCaptchaMessage) {
                 addDownloadMmsAction(notifBuilder, wearableExtender, notificationState);
-                addWearableVoiceReplyAction(notifBuilder, wearableExtender, notificationState);
-                addWearableVoiceCallAction(notifBuilder, wearableExtender, notificationState);
-                addWearableReadAction(notifBuilder, wearableExtender, notificationState);
+                addReplyAction(notifBuilder, wearableExtender, notificationState);
+                addReadAction(notifBuilder, wearableExtender, notificationState);
             }
         }
 

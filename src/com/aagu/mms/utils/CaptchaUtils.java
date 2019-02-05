@@ -14,11 +14,9 @@ import java.util.Comparator;
 
 public class CaptchasUtils {
 
-    private static String SmsContent = null;
-
-    private static String findSMSCode(String content) {
+    public static CaptchaInfo getCaptchaInfo(String content) {
         if (content.length() == 0)
-            return "";
+            return null;
 
         // 去掉 URL
         String pattern = "[a-zA-z]+://[^\\s]*";
@@ -57,10 +55,10 @@ public class CaptchasUtils {
                 String code = findCode(str);
 
                 if (code != null)
-                    return code;
+                    return new CaptchaInfo(sender.size() > 0 ? sender.get(0) : "", code);
             }
         }
-        return "";
+        return null;
     }
 
     private static String cutSenderFromString(ArrayList<String> list, String content, String start, String end) {
@@ -168,20 +166,21 @@ public class CaptchasUtils {
         return null;
     }
 
-    public static String getCaptchasCode(String content) {
-        return findSMSCode(content);
-    }
+    public static class CaptchaInfo {
+        private String sender;
+        private String code;
 
-    public static String getCaptchaProvider(String SmsBody, String SmsAddress) {
-        // 找到并去掉发送者
-        ArrayList<String> sender = new ArrayList<>();
-        cutSenderFromString(sender, SmsAddress, "[", "]");
-        cutSenderFromString(sender, SmsAddress, "【", "】");
-        cutSenderFromString(sender, SmsBody, "[", "]");
-        cutSenderFromString(sender, SmsBody, "【", "】");
-        if(sender.size() > 0) {
-            return sender.get(0);
+        public CaptchaInfo(String sender, String code) {
+            this.sender = sender;
+            this.code = code;
         }
-        return "unkown";
+
+        public String getProvider() {
+            return this.sender;
+        }
+
+        public String getCaptcha() {
+            return this.code;
+        }
     }
 }
