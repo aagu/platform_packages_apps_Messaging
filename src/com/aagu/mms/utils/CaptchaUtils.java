@@ -3,6 +3,7 @@ package com.aagu.mms.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import com.aagu.mms.utils.CaptchaInfo;
 
 /**
  * CaptchasUtils.java
@@ -12,7 +13,7 @@ import java.util.Comparator;
  * aagu <aaguisme@gmail.com>
  */
 
-public class CaptchasUtils {
+public class CaptchaUtils {
 
     public static CaptchaInfo getCaptchaInfo(String content) {
         if (content.length() == 0)
@@ -166,21 +167,4 @@ public class CaptchasUtils {
         return null;
     }
 
-    public static class CaptchaInfo {
-        private String sender;
-        private String code;
-
-        public CaptchaInfo(String sender, String code) {
-            this.sender = sender;
-            this.code = code;
-        }
-
-        public String getProvider() {
-            return this.sender;
-        }
-
-        public String getCaptcha() {
-            return this.code;
-        }
-    }
 }

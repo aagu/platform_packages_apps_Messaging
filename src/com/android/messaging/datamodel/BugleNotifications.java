@@ -88,7 +88,9 @@ import com.android.messaging.util.PhoneUtils;
 import com.android.messaging.util.RingtoneUtil;
 import com.android.messaging.util.ThreadUtil;
 import com.android.messaging.util.UriUtil;
-import com.aagu.mms.utils.*;
+
+import com.aagu.mms.utils.CaptchaUtils;
+import com.aagu.mms.utils.CaptchaInfo;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -848,7 +850,7 @@ public class BugleNotifications {
             final ConversationLineInfo convInfo =
                     ((MultiMessageNotificationState) notificationState).mConvList.mConvInfos.get(0);
             String content = ((MultiMessageNotificationState) notificationState).mContent.toString();
-            CaptchaUtils.CaptchaInfo captchaInfo = CaptchaUtils.getCaptchaInfo(content);
+            CaptchaInfo captchaInfo = CaptchaUtils.getCaptchaInfo(content);
             if (captchaInfo != null) {
                 isCaptchaMessage = true;
                 String captchaTitle = TextUtils.isEmpty(captchaInfo.getProvider())
