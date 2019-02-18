@@ -17,7 +17,6 @@
 package com.android.messaging.datamodel.action;
 
 import android.app.AlarmManager;
-import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -322,18 +321,4 @@ public class ActionServiceImpl extends JobIntentService {
                 EXECUTION_TIME_WARN_LIMIT_MS);
     }
 
-    private void createChannel() {
-        NotificationManager manager = getSystemService(NotificationManager.class);
-
-        NotificationChannel existing = manager.getNotificationChannel(CHANNEL_ID);
-        if (existing != null) {
-            return;
-        }
-
-        Context context = Factory.get().getApplicationContext();
-        String title = context.getString(R.string.notification_channel_service);
-        NotificationChannel newChannel = new NotificationChannel(CHANNEL_ID,
-                title, NotificationManager.IMPORTANCE_NONE);
-        manager.createNotificationChannel(newChannel);
-    }
 }

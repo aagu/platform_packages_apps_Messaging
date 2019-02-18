@@ -153,18 +153,4 @@ public class BackgroundWorkerService extends JobIntentService {
         }
     }
 
-    private void createChannel() {
-        NotificationManager manager = getSystemService(NotificationManager.class);
-
-        NotificationChannel existing = manager.getNotificationChannel(CHANNEL_ID);
-        if (existing != null) {
-            return;
-        }
-
-        Context context = Factory.get().getApplicationContext();
-        String title = context.getString(R.string.notification_channel_service);
-        NotificationChannel newChannel = new NotificationChannel(CHANNEL_ID,
-                title, NotificationManager.IMPORTANCE_NONE);
-        manager.createNotificationChannel(newChannel);
-    }
 }
