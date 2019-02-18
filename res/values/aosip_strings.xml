@@ -41,10 +41,7 @@
 
     <!-- Notification channel -->
     <string name="notification_channel_message">Messages</string>
-    <string name="notification_channel_service">Foreground Service</string>
-    <string name="background_worker_notif">Checking messages\u2026</string>
-    <string name="action_service_notif">Action Service Running\u2026</string>
-
+    
     <!-- Captcha -->
     <string name="captcha_title">Verification code is %s</string>
     <string name="captcha_with_provider_title">Verification code is %1$s 【%2$s】</string>
