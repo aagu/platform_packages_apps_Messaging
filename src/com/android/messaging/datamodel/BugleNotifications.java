@@ -85,7 +85,6 @@ import com.android.messaging.util.NotificationPlayer;
 import com.android.messaging.util.OsUtil;
 import com.android.messaging.util.PendingIntentConstants;
 import com.android.messaging.util.PhoneUtils;
-import com.android.messaging.util.RingtoneUtil;
 import com.android.messaging.util.ThreadUtil;
 import com.android.messaging.util.UriUtil;
 
@@ -186,23 +185,23 @@ public class BugleNotifications {
         }
         Assert.isNotMainThread();
         checkInitialized();
-
-        if (!shouldNotify()) {
-            if (LogUtil.isLoggable(TAG, LogUtil.VERBOSE)) {
-                LogUtil.v(TAG, "Notifications disabled");
-            }
-            cancel(PendingIntentConstants.SMS_NOTIFICATION_ID);
-            return;
-        } else {
-            if ((coverage & UPDATE_MESSAGES) != 0) {
-                createMessageNotification(silent, conversationId);
-            }
+        if ((coverage & UPDATE_MESSAGES) != 0) {
+            createMessageNotification(silent, conversationId);
         }
+
         if ((coverage & UPDATE_ERRORS) != 0) {
             MessageNotificationState.checkFailedMessages();
         }
     }
     
+    /**
+     * Play a sound to notify arrival of a class 0 message
+     *
+     */
+    public static void playClassZeroNotification() {
+        playObservableConversationNotificationSound(null);
+    }
+
     /**
      * Cancel all notifications of a certain type.
      *
@@ -302,56 +301,6 @@ public class BugleNotifications {
     }
 
     /**
-     * Returns {@code true} if incoming notifications should display a
-     * notification, {@code false} otherwise.
-     *
-     * @return true if the notification should occur
-     */
-    private static boolean shouldNotify() {
-        // If we're not the default sms app, don't put up any notifications.
-        if (!PhoneUtils.getDefault().isDefaultSmsApp()) {
-            return false;
-        }
-
-        // Now check prefs (i.e. settings) to see if the user turned off notifications.
-        final BuglePrefs prefs = BuglePrefs.getApplicationPrefs();
-        final Context context = Factory.get().getApplicationContext();
-        final String prefKey = context.getString(R.string.notifications_enabled_pref_key);
-        final boolean defaultValue = context.getResources().getBoolean(
-                R.bool.notifications_enabled_pref_default);
-        return prefs.getBoolean(prefKey, defaultValue);
-    }
-
-    /**
-     * Returns {@code true} if incoming notifications for the given {@link NotificationState}
-     * should vibrate the device, {@code false} otherwise.
-     *
-     * @return true if vibration should be used
-     */
-    public static boolean shouldVibrate(final NotificationState state) {
-        // The notification should vibrate if the global setting is turned on AND
-        // the per-conversation setting is turned on (default).
-        if (!state.getNotificationVibrate()) {
-            return false;
-        } else {
-            final BuglePrefs prefs = BuglePrefs.getApplicationPrefs();
-            final Context context = Factory.get().getApplicationContext();
-            final String prefKey = context.getString(R.string.notification_vibration_pref_key);
-            final boolean defaultValue = context.getResources().getBoolean(
-                    R.bool.notification_vibration_pref_default);
-            return prefs.getBoolean(prefKey, defaultValue);
-        }
-    }
-
-    private static Uri getNotificationRingtoneUriForConversationId(final String conversationId) {
-        final DatabaseWrapper db = DataModel.get().getDatabase();
-        final ConversationListItemData convData =
-                ConversationListItemData.getExistingConversation(db, conversationId);
-        return RingtoneUtil.getNotificationRingtoneUri(
-                convData != null ? convData.getNotificationSoundUri() : null);
-    }
-
-    /**
      * Returns a unique tag to identify a notification.
      *
      * @param name The tag name (in practice, the type)
@@ -428,9 +377,13 @@ public class BugleNotifications {
         notifBuilder.setCategory(Notification.CATEGORY_MESSAGE);
         // TODO: Need to fix this for multi conversation notifications to rate limit dings.
         final String conversationId = state.mConversationIds.first();
+        String id = NotifUtils.DEFAULT_CHANNEL_ID;
+        if (NotifUtils.getNotificationChannel(context, conversationId) != null) {
+            id = conversationId;
+        }
+        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context, id);
+        notifBuilder.setCategory(Notification.CATEGORY_MESSAGE);
 
-
-        final Uri ringtoneUri = RingtoneUtil.getNotificationRingtoneUri(state.getRingtoneUri());
         // If the notification's conversation is currently observable (focused or in the
         // conversation list),  then play a notification beep at a low volume and don't display an
         // actual notification.
@@ -440,7 +393,7 @@ public class BugleNotifications {
                         "sCurrentlyDisplayedConversationId so NOT showing notification," +
                         " but playing soft sound. conversationId: " + conversationId);
             }
-            playObservableConversationNotificationSound(ringtoneUri);
+            playObservableConversationNotificationSound(conversationId);
             return;
         }
         state.mBaseRequestCode = state.mType;
@@ -453,7 +406,7 @@ public class BugleNotifications {
             notifBuilder.setDeleteIntent(clearIntent);
         }
 
-        updateBuilderAudioVibrate(state, notifBuilder, silent, ringtoneUri, conversationId);
+        updateBuilderAudioVibrate(state, notifBuilder, silent, conversationId);
 
         // Set the content intent
         PendingIntent destinationIntent;
@@ -611,8 +564,7 @@ public class BugleNotifications {
         if (state == null) {
             cancel(PendingIntentConstants.SMS_NOTIFICATION_ID);
             if (softSound && !TextUtils.isEmpty(conversationId)) {
-                final Uri ringtoneUri = getNotificationRingtoneUriForConversationId(conversationId);
-                playObservableConversationNotificationSound(ringtoneUri);
+                playObservableConversationNotificationSound(conversationId);
             }
             return;
         }
@@ -650,8 +602,8 @@ public class BugleNotifications {
 
     private static void updateBuilderAudioVibrate(final NotificationState state,
             final NotificationCompat.Builder notifBuilder, final boolean silent,
-            final Uri ringtoneUri, final String conversationId) {
-        int defaults = Notification.DEFAULT_LIGHTS;
+            final String conversationId) {
+        int defaults = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE;
         if (!silent) {
             final BuglePrefs prefs = Factory.get().getApplicationPrefs();
             final long latestNotificationTimestamp = prefs.getLong(
@@ -673,10 +625,6 @@ public class BugleNotifications {
                     if (lastTime == null
                             || SystemClock.elapsedRealtime() - lastTime > sTimeBetweenDingsMs) {
                         sLastMessageDingTime.put(conversationId, SystemClock.elapsedRealtime());
-                        notifBuilder.setSound(ringtoneUri);
-                        if (shouldVibrate(state)) {
-                            defaults |= Notification.DEFAULT_VIBRATE;
-                        }
                     }
                 }
             }
@@ -830,6 +778,11 @@ public class BugleNotifications {
                 notificationState.mNotificationBuilder.setLargeIcon(smallBitmap);
 
                 // Add a wearable page with no visible card so you can more easily see the photo.
+                String conversationId = notificationState.mConversationIds.first();
+                String id = NotifUtils.DEFAULT_CHANNEL_ID;
+                if (NotifUtils.getNotificationChannel(context, conversationId) != null) {
+                    id = conversationId;
+                }
                 final NotificationCompat.Builder photoPageNotifBuilder =
                         new NotificationCompat.Builder(Factory.get().getApplicationContext(), CHANNEL_ID);
                 final WearableExtender photoPageWearableExtender = new WearableExtender();
@@ -845,6 +798,7 @@ public class BugleNotifications {
 
             maybeAddWearableConversationLog(wearableExtender,
                     (MultiMessageNotificationState) notificationState);
+<<<<<<< HEAD
 
             boolean isCaptchaMessage = false;
             final ConversationLineInfo convInfo =
@@ -1039,7 +993,6 @@ public class BugleNotifications {
         notification.defaults |= Notification.DEFAULT_LIGHTS;
 
         createChannel();
-
         notificationManager.notify(notificationTag, type, notification);
 
         LogUtil.i(TAG, "Notifying for conversation " + conversationId + "; "
@@ -1163,7 +1116,7 @@ public class BugleNotifications {
      * Play the observable conversation notification sound (it's the regular notification sound, but
      * played at half-volume)
      */
-    private static void playObservableConversationNotificationSound(final Uri ringtoneUri) {
+    private static void playObservableConversationNotificationSound(final String conversationId) {
         final Context context = Factory.get().getApplicationContext();
         final AudioManager audioManager = (AudioManager) context
                 .getSystemService(Context.AUDIO_SERVICE);
@@ -1174,7 +1127,11 @@ public class BugleNotifications {
         }
 
         final NotificationPlayer player = new NotificationPlayer(LogUtil.BUGLE_TAG);
-        player.play(ringtoneUri, false,
+        NotificationChannel channel = NotifUtils.getNotificationChannel(context, conversationId);
+        if (channel == null) {
+            channel = NotifUtils.getNotificationChannel(context, NotifUtils.DEFAULT_CHANNEL_ID);
+        }
+        player.play(channel != null ? channel.getSound() : null, false,
                 AudioManager.STREAM_NOTIFICATION,
                 OBSERVABLE_CONVERSATION_NOTIFICATION_VOLUME);
 
@@ -1279,7 +1236,9 @@ public class BugleNotifications {
                 .setSound(UriUtil.getUriForResourceId(context, R.raw.message_failure));
 
         final String tag = context.getPackageName() + ":emergency_sms_error";
+        
         createChannel();
+        
         NotificationManagerCompat.from(context).notify(
                 tag,
                 PendingIntentConstants.MSG_SEND_ERROR,

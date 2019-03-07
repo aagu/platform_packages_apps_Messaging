@@ -37,7 +37,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class ActionServiceImpl extends JobIntentService {
     private static final String TAG = LogUtil.BUGLE_DATAMODEL_TAG;
-    
+
     public ActionServiceImpl() {
         super();
     }
@@ -105,8 +105,13 @@ public class ActionServiceImpl extends JobIntentService {
     }
 
     /**
+<<<<<<< HEAD
     * Unique job ID for this service.
     */
+=======
+     * Unique job ID for this service.
+     */
+>>>>>>> 8d5eae170c1bc5c8353d637af13aed1592862786
     static final int JOB_ID = 1000;
 
     // ops
@@ -232,8 +237,13 @@ public class ActionServiceImpl extends JobIntentService {
 
     static void enqueueWork(Context context, Intent work) {
         enqueueWork(context, ActionServiceImpl.class, JOB_ID, work);
+<<<<<<< HEAD
     }
     
+=======
+     }
+
+>>>>>>> 8d5eae170c1bc5c8353d637af13aed1592862786
     /**
      * {@inheritDoc}
      */
@@ -245,6 +255,10 @@ public class ActionServiceImpl extends JobIntentService {
             return;
         }
         final int opcode = intent.getIntExtra(EXTRA_OP_CODE, 0);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8d5eae170c1bc5c8353d637af13aed1592862786
         Action action;
         final Bundle actionBundle = intent.getBundleExtra(EXTRA_ACTION_BUNDLE);
         actionBundle.setClassLoader(getClassLoader());
@@ -254,11 +268,16 @@ public class ActionServiceImpl extends JobIntentService {
                 executeAction(action);
                 break;
             }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8d5eae170c1bc5c8353d637af13aed1592862786
             case OP_RECEIVE_BACKGROUND_RESPONSE: {
                 action = (Action) actionBundle.getParcelable(BUNDLE_ACTION);
                 final Bundle response = intent.getBundleExtra(EXTRA_WORKER_RESPONSE);
                 processBackgroundResponse(action, response);
                 break;
+<<<<<<< HEAD
             }
 
             case OP_RECEIVE_BACKGROUND_FAILURE: {
@@ -267,6 +286,16 @@ public class ActionServiceImpl extends JobIntentService {
                 break;
             }
 
+=======
+            }
+
+            case OP_RECEIVE_BACKGROUND_FAILURE: {
+                action = (Action) actionBundle.getParcelable(BUNDLE_ACTION);
+                processBackgroundFailure(action);
+                break;
+            }
+
+>>>>>>> 8d5eae170c1bc5c8353d637af13aed1592862786
             default:
                 throw new RuntimeException("Unrecognized opcode in ActionServiceImpl");
         }
