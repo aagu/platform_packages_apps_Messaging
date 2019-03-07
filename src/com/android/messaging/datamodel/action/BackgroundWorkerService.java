@@ -97,7 +97,12 @@ public class BackgroundWorkerService extends JobIntentService {
 
     static void enqueueWork(Context context, Intent work) {
         enqueueWork(context, BackgroundWorkerService.class, JOB_ID, work);
+
     }
+
+    static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, BackgroundWorkerService.class, JOB_ID, work);
+     }
 
     @Override
     protected void onHandleWork(final Intent intent) {
@@ -107,6 +112,7 @@ public class BackgroundWorkerService extends JobIntentService {
             return;
         }
         final int opcode = intent.getIntExtra(EXTRA_OP_CODE, 0);
+
         switch(opcode) {
             case OP_PROCESS_REQUEST: {
                 final Action action = intent.getParcelableExtra(EXTRA_ACTION);
